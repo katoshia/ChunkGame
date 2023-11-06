@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chunk : MonoBehaviour
+public class Chunk
 {
 
-    // grab mesh renderer and filter
-    public MeshRenderer meshRend;
-    public MeshFilter meshFilter;
+    // grab mesh renderer and filter and gameObject
+    GameObject chunkObject;
+    MeshRenderer meshRend;
+    MeshFilter meshFilter;
 
     // Voxel planning parameters - coordinates to pull from CoordinateData class
 
@@ -20,14 +21,19 @@ public class Chunk : MonoBehaviour
     byte[,,] coordMap = new byte[CoordinateData.chunkWidth, CoordinateData.chunkHeight, CoordinateData.chunkWidth];
     World world;
     
-    // Start is called before the first frame update
-    void Start()
+    public Chunk(World _world)
     {
-        world = GameObject.Find("World").GetComponent<World>();
+        world = _world;
+        chunkObject = new GameObject();
+        meshFilter = chunkObject.AddComponent<MeshFilter>();
+        meshRend = chunkObject.AddComponent<MeshRenderer>();
+        meshRend.material = world.material;
+        chunkObject.transform.SetParent(world.transform);
         PopulateCoordMap();
         CreateChunk();
         CreateMesh();
     }
+
     // populate the coordinate map for chunk
     void PopulateCoordMap()
     {
@@ -37,7 +43,12 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < CoordinateData.chunkWidth; z++)
                 {
-                    coordMap[x, y, z] = 1;
+                    if (y < 1)
+                        coordMap[x, y, z] = 1;
+                    else if (y == CoordinateData.chunkHeight - 1)
+                        coordMap[x, y, z] = 3;
+                    else
+                        coordMap[x, y, z] = 2;
                 }
 
             }
