@@ -37,7 +37,7 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < CoordinateData.chunkWidth; z++)
                 {
-                    coordMap[x, y, z] = 0;
+                    coordMap[x, y, z] = 1;
                 }
 
             }
