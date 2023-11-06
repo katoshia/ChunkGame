@@ -16,10 +16,13 @@ public class Chunk : MonoBehaviour
     List<Vector2> uvs = new List<Vector2>();
 
     // bool for checking if face is touching another face.
-    bool[,,] coordMap = new bool[CoordinateData.chunkWidth, CoordinateData.chunkHeight, CoordinateData.chunkWidth];
+    byte[,,] coordMap = new byte[CoordinateData.chunkWidth, CoordinateData.chunkHeight, CoordinateData.chunkWidth];
+    World world;
+    
     // Start is called before the first frame update
     void Start()
     {
+        world = GameObject.Find("World").GetComponent<World>();
         PopulateCoordMap();
         CreateChunk();
         CreateMesh();
@@ -33,7 +36,7 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < CoordinateData.chunkWidth; z++)
                 {
-                    coordMap[x, y, z] = true;
+                    coordMap[x, y, z] = 0;
                 }
 
             }
@@ -76,7 +79,7 @@ public class Chunk : MonoBehaviour
         {
             return false;
         }
-        return coordMap[x,y,z];
+        return world.blockTypes[coordMap[x,y,z]].isSolid;
     }
     void AddCoorDataToChunk(Vector3 position)
     {
@@ -84,18 +87,40 @@ public class Chunk : MonoBehaviour
         {
             if(!CheckCoord(position+CoordinateData.touchCheck[j]))
             {
-                for (int i = 0; i < 6; i++)
-                {
-                    int triangleIndex = CoordinateData.coordTris[j, i];
-                    vertices.Add(CoordinateData.coordVerts[triangleIndex] + position);
+                // add our vertices
+                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 0]]);
+                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 1]]);
+                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 2]]);
+                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 3]]);
 
-                    triangles.Add(vertexIndex);
-                    uvs.Add(CoordinateData.coordUVS[i]);
-                    vertexIndex++;
-                }
+                AddTexture(0);
+                // add the triangles - 2 per face.
+                // 0,1,2,2,1,3
+                triangles.Add(vertexIndex);// 0
+                triangles.Add(vertexIndex+1);//1
+                triangles.Add(vertexIndex+2);//2
+                triangles.Add(vertexIndex+2);//2
+                triangles.Add(vertexIndex+1);//1
+                triangles.Add(vertexIndex+3);//3
+                vertexIndex += 4;
             }
 
         }
+    }
+    void AddTexture(int textureID)
+    {
+        float y = textureID / CoordinateData.TextureAtlasSizeBlocks;
+        float x = textureID - (y * CoordinateData.TextureAtlasSizeBlocks);
+
+        x *= CoordinateData.NormalizedBlockTextureSize;
+        y *= CoordinateData.NormalizedBlockTextureSize;
+
+        y = 1f - y - CoordinateData.NormalizedBlockTextureSize;
+
+        uvs.Add(new Vector2(x, y));
+        uvs.Add(new Vector2(x, y+CoordinateData.NormalizedBlockTextureSize));
+        uvs.Add(new Vector2(x+CoordinateData.NormalizedBlockTextureSize, y));
+        uvs.Add(new Vector2(x+CoordinateData.NormalizedBlockTextureSize, y+CoordinateData.NormalizedBlockTextureSize));
     }
 
 }
