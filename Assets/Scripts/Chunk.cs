@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
+
     // grab mesh renderer and filter
     public MeshRenderer meshRend;
     public MeshFilter meshFilter;
@@ -87,13 +88,15 @@ public class Chunk : MonoBehaviour
         {
             if(!CheckCoord(position+CoordinateData.touchCheck[j]))
             {
+
+                byte blockID = coordMap[(int)position.x, (int)position.y, (int)position.z];
                 // add our vertices
                 vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 0]]);
                 vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 1]]);
                 vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 2]]);
                 vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 3]]);
 
-                AddTexture(0);
+                AddTexture(world.blockTypes[blockID].getTextureID(j));
                 // add the triangles - 2 per face.
                 // 0,1,2,2,1,3
                 triangles.Add(vertexIndex);// 0

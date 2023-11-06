@@ -13,13 +13,20 @@ public class BlockType
     public string blockName;
     public bool isSolid;
 
-    [Header("TextureValues")]
+    [Header("Texture Values")]
     public int backFaceTexture;
     public int frontFaceTexture;
     public int topFaceTexture;
     public int bottomFaceTexture;
     public int leftFaceTexture;
     public int rightFaceTexture;
+    //[Header("TextureValues")]
+    //public int backFaceTexture;
+    //public int frontFaceTexture;
+    //public int topFaceTexture;
+    //public int bottomFaceTexture;
+    //public int leftFaceTexture;
+    //public int rightFaceTexture;
 
 
     // back, front, top, bottom, left, right
