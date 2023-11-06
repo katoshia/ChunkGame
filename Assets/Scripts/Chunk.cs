@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Chunk
 {
-
+    public ChunkCard card;
     // grab mesh renderer and filter and gameObject
     GameObject chunkObject;
     MeshRenderer meshRend;
@@ -20,15 +20,21 @@ public class Chunk
     // bool for checking if face is touching another face.
     byte[,,] coordMap = new byte[CoordinateData.chunkWidth, CoordinateData.chunkHeight, CoordinateData.chunkWidth];
     World world;
-    
-    public Chunk(World _world)
+
+    public Chunk(ChunkCard _card, World _world)
     {
+        // set up variables
+        card = _card;
         world = _world;
         chunkObject = new GameObject();
         meshFilter = chunkObject.AddComponent<MeshFilter>();
         meshRend = chunkObject.AddComponent<MeshRenderer>();
+        // set up chunk
         meshRend.material = world.material;
         chunkObject.transform.SetParent(world.transform);
+        chunkObject.transform.position = new Vector3(card.x * CoordinateData.chunkWidth, 0f, card.z * CoordinateData.chunkWidth);
+        chunkObject.name = "Chunk " + card.x + " , " + card.z;
+        // run the methods to create the chunk
         PopulateCoordMap();
         CreateChunk();
         CreateMesh();
@@ -87,17 +93,17 @@ public class Chunk
         int y = Mathf.FloorToInt(position.y);
         int z = Mathf.FloorToInt(position.z);
 
-        if (x < 0 || x > CoordinateData.chunkWidth - 1 || y < 0||y>CoordinateData.chunkHeight-1 ||z<0||z>CoordinateData.chunkWidth-1)
+        if (x < 0 || x > CoordinateData.chunkWidth - 1 || y < 0 || y > CoordinateData.chunkHeight - 1 || z < 0 || z > CoordinateData.chunkWidth - 1)
         {
             return false;
         }
-        return world.blockTypes[coordMap[x,y,z]].isSolid;
+        return world.blockTypes[coordMap[x, y, z]].isSolid;
     }
     void AddCoorDataToChunk(Vector3 position)
     {
         for (int j = 0; j < 6; j++)
         {
-            if(!CheckCoord(position+CoordinateData.touchCheck[j]))
+            if (!CheckCoord(position + CoordinateData.touchCheck[j]))
             {
 
                 byte blockID = coordMap[(int)position.x, (int)position.y, (int)position.z];
@@ -111,11 +117,11 @@ public class Chunk
                 // add the triangles - 2 per face.
                 // 0,1,2,2,1,3
                 triangles.Add(vertexIndex);// 0
-                triangles.Add(vertexIndex+1);//1
-                triangles.Add(vertexIndex+2);//2
-                triangles.Add(vertexIndex+2);//2
-                triangles.Add(vertexIndex+1);//1
-                triangles.Add(vertexIndex+3);//3
+                triangles.Add(vertexIndex + 1);//1
+                triangles.Add(vertexIndex + 2);//2
+                triangles.Add(vertexIndex + 2);//2
+                triangles.Add(vertexIndex + 1);//1
+                triangles.Add(vertexIndex + 3);//3
                 vertexIndex += 4;
             }
 
@@ -132,9 +138,20 @@ public class Chunk
         y = 1f - y - CoordinateData.NormalizedBlockTextureSize;
 
         uvs.Add(new Vector2(x, y));
-        uvs.Add(new Vector2(x, y+CoordinateData.NormalizedBlockTextureSize));
-        uvs.Add(new Vector2(x+CoordinateData.NormalizedBlockTextureSize, y));
-        uvs.Add(new Vector2(x+CoordinateData.NormalizedBlockTextureSize, y+CoordinateData.NormalizedBlockTextureSize));
+        uvs.Add(new Vector2(x, y + CoordinateData.NormalizedBlockTextureSize));
+        uvs.Add(new Vector2(x + CoordinateData.NormalizedBlockTextureSize, y));
+        uvs.Add(new Vector2(x + CoordinateData.NormalizedBlockTextureSize, y + CoordinateData.NormalizedBlockTextureSize));
     }
+}
 
+public class ChunkCard 
+{
+    public int x;
+    public int z;
+
+    public ChunkCard(int _x, int _z)
+    {
+        x = _x;
+        z = _z;
+    }
 }

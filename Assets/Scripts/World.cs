@@ -9,9 +9,25 @@ public class World : MonoBehaviour
 
     private void Start()
     {
-        Chunk newChunk = new Chunk(this);
+        //Chunk newChunk = new Chunk(new ChunkCard(0,0), this);
+        //Chunk newChunk2 = new Chunk(new ChunkCard(0,0), this);
+        GenerateID();
+    }
+
+    void GenerateID()
+    {
+        for(int i=0;i<CoordinateData.worldSizeInChunks;i++)
+        {
+            for (int j = 0; j < CoordinateData.worldSizeInChunks; j++)
+            {
+                Chunk newChunk = new Chunk(new ChunkCard(i, j),this);
+            }
+
+        }
     }
 }
+
+
 
 
 [System.Serializable]

@@ -7,6 +7,7 @@ public static class CoordinateData
 {
     public static readonly int chunkWidth = 5;
     public static readonly int chunkHeight = 3;
+    public static readonly int worldSizeInChunks = 5;
 
     public static readonly int TextureAtlasSizeBlocks = 4;
     public static float NormalizedBlockTextureSize 
