@@ -49,12 +49,7 @@ public class Chunk
             {
                 for (int z = 0; z < CoordinateData.chunkWidth; z++)
                 {
-                    if (y < 1)
-                        coordMap[x, y, z] = 1;
-                    else if (y == CoordinateData.chunkHeight - 1)
-                        coordMap[x, y, z] = 3;
-                    else
-                        coordMap[x, y, z] = 2;
+                    coordMap[x, y, z] = world.GetBlock(new Vector3(x, y, z) + Position);
                 }
 
             }
@@ -86,32 +81,49 @@ public class Chunk
         mesh.RecalculateNormals();
         meshFilter.mesh = mesh;
     }
-    // check coordniates for faces - return the coordinates
-    bool CheckCoord(Vector3 position)
-    {
-        int x = Mathf.FloorToInt(position.x);
-        int y = Mathf.FloorToInt(position.y);
-        int z = Mathf.FloorToInt(position.z);
 
+    public bool isActive
+    {
+        get { return chunkObject.activeSelf; }
+        set { chunkObject.SetActive(value); }
+    }
+    public Vector3 Position
+    {
+        get { return chunkObject.transform.position; }
+    }
+    bool isVoxelInChunk(int x, int y, int z)
+    {
         if (x < 0 || x > CoordinateData.chunkWidth - 1 || y < 0 || y > CoordinateData.chunkHeight - 1 || z < 0 || z > CoordinateData.chunkWidth - 1)
-        {
             return false;
+        else
+            return true;
+
+    }
+    // check coordniates for faces - return the coordinates
+    bool CheckCoord(Vector3 pos)
+    {
+        int x = Mathf.FloorToInt(pos.x);
+        int y = Mathf.FloorToInt(pos.y);
+        int z = Mathf.FloorToInt(pos.z);
+        if (!isVoxelInChunk(x,y,z))
+        {
+            return world.blockTypes[world.GetBlock(pos + Position)].isSolid;
         }
         return world.blockTypes[coordMap[x, y, z]].isSolid;
     }
-    void AddCoorDataToChunk(Vector3 position)
+    void AddCoorDataToChunk(Vector3 pos)
     {
         for (int j = 0; j < 6; j++)
         {
-            if (!CheckCoord(position + CoordinateData.touchCheck[j]))
+            if (!CheckCoord(pos + CoordinateData.touchCheck[j]))
             {
 
-                byte blockID = coordMap[(int)position.x, (int)position.y, (int)position.z];
+                byte blockID = coordMap[(int)pos.x, (int)pos.y, (int)pos.z];
                 // add our vertices
-                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 0]]);
-                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 1]]);
-                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 2]]);
-                vertices.Add(position + CoordinateData.coordVerts[CoordinateData.coordTris[j, 3]]);
+                vertices.Add(pos + CoordinateData.coordVerts[CoordinateData.coordTris[j, 0]]);
+                vertices.Add(pos + CoordinateData.coordVerts[CoordinateData.coordTris[j, 1]]);
+                vertices.Add(pos + CoordinateData.coordVerts[CoordinateData.coordTris[j, 2]]);
+                vertices.Add(pos + CoordinateData.coordVerts[CoordinateData.coordTris[j, 3]]);
 
                 AddTexture(world.blockTypes[blockID].getTextureID(j));
                 // add the triangles - 2 per face.

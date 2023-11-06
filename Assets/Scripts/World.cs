@@ -7,10 +7,10 @@ public class World : MonoBehaviour
     public Material material;
     public BlockType[] blockTypes;
 
+    Chunk[,] chunks = new Chunk[CoordinateData.worldSizeInChunks, CoordinateData.worldSizeInChunks];
+
     private void Start()
     {
-        //Chunk newChunk = new Chunk(new ChunkCard(0,0), this);
-        //Chunk newChunk2 = new Chunk(new ChunkCard(0,0), this);
         GenerateID();
     }
 
@@ -20,10 +20,39 @@ public class World : MonoBehaviour
         {
             for (int j = 0; j < CoordinateData.worldSizeInChunks; j++)
             {
-                Chunk newChunk = new Chunk(new ChunkCard(i, j),this);
+                CreateNewChunk(i, j);
             }
 
         }
+    }
+    public byte GetBlock (Vector3 pos)
+    {
+        if (!IsBlockInWorld(pos))
+            return 0;
+        if (pos.y < 1)
+            return 1;
+        else if (pos.y == CoordinateData.chunkHeight - 1)
+            return 3;
+        else
+            return 2;
+    }
+    void CreateNewChunk(int x, int z)
+    {
+        chunks[x, z] = new Chunk(new ChunkCard(x, z), this);
+    }
+    bool isChunkInWorld (ChunkCard card)
+    {
+        if (card.x > 0 && card.x < CoordinateData.worldSizeInChunks - 1 && card.z > 0 && card.z < CoordinateData.worldSizeInChunks - 1)
+            return true;
+        else
+            return false;
+    }
+    bool IsBlockInWorld(Vector3 pos)
+    {
+        if (pos.x >= 0 && pos.x < CoordinateData.worldSizeinBlocks && pos.y >= 0 && pos.y < CoordinateData.chunkHeight && pos.z >= 0 && pos.z < CoordinateData.worldSizeinBlocks)
+            return true;
+        else
+            return false;
     }
 }
 
